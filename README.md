@@ -1,29 +1,39 @@
-# Welcome to your Lovable project
+# AGS CRACKERS
 
-This project was built with [Lovable](https://lovable.dev).
+Premium Online Crackers Catalogue for AGS CRACKERS.
 
-## Build with Lovable
+## About
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+AGS CRACKERS provides a digital catalogue for browsing crackers, checking product details and preparing order enquiries.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+## Features
+
+- Product catalogue
+- Product categories
+- Product search
+- Shopping cart
+- Customer details collection
+- Order enquiry PDF generation
+- Automatic order number generation
+- WhatsApp order enquiry
+- Mobile responsive design
+- Product images
+- Customer name, mobile number and address
+
+## Tech Stack
+
+- React
+- TypeScript
+- TanStack Start
+- TanStack Router
+- Tailwind CSS
+- Vite
+- Google Apps Script
+- Google Sheets
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Install dependencies:
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
-
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+```bash
+npm install
