@@ -231,12 +231,15 @@ function PdfSuccessPopup({
   );
 }
 
+
+
 /* ============================================================
    HEADER
    ============================================================ */
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showMinimumOrderToast, setShowMinimumOrderToast] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
 
@@ -323,6 +326,39 @@ export function Header() {
 
   return (
     <>
+      <style>{`
+        @keyframes ags-min-order-scroll {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-25%);
+          }
+        }
+
+        @keyframes ags-min-order-blink {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.45;
+          }
+        }
+
+        .ags-min-order-marquee {
+          animation:
+            ags-min-order-scroll 18s linear infinite,
+            ags-min-order-blink 1.2s ease-in-out infinite;
+          will-change: transform, opacity;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .ags-min-order-marquee {
+            animation: none;
+          }
+        }
+      `}</style>
+
       <header className="sticky top-0 z-50 bg-card shadow-sm">
         <div className="bg-navy text-secondary-foreground">
           <div className="page-container flex min-h-8 items-center justify-between gap-2 text-[10px] font-medium tracking-wide sm:min-h-9 sm:gap-3 sm:text-xs">
@@ -368,6 +404,20 @@ export function Header() {
                 </span>
               </a>
             </div>
+          </div>
+        </div>
+
+        {/* Minimum Order Marquee */}
+        <div className="overflow-hidden bg-primary text-primary-foreground">
+          <div className="ags-min-order-marquee flex min-w-max items-center whitespace-nowrap py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em] sm:py-2 sm:text-xs">
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
           </div>
         </div>
 
@@ -535,6 +585,75 @@ export function Header() {
 
         <div className="h-[3px] shimmer-line" />
       </header>
+
+      {/* =====================================================
+          MINIMUM ORDER TOAST
+      ====================================================== */}
+      {showMinimumOrderToast && (
+        <div
+          className="
+            fixed
+            bottom-24
+            right-4
+            z-[9999]
+            w-[calc(100%-2rem)]
+            max-w-[360px]
+            rounded-2xl
+            border
+            border-primary/20
+            bg-white
+            p-4
+            shadow-2xl
+            ring-1
+            ring-black/5
+            sm:right-6
+            sm:bottom-28
+          "
+          role="alert"
+          aria-live="polite"
+        >
+          <div className="flex items-start gap-3">
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary text-lg">
+              🧨
+            </span>
+
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-extrabold uppercase tracking-wide text-navy">
+                Minimum Order Value
+              </p>
+
+              <p className="mt-1 text-xl font-black text-primary">
+                ₹5,000
+              </p>
+
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                Minimum order value is ₹5,000. You can still
+                download the PDF and send your enquiry via WhatsApp.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowMinimumOrderToast(false)}
+              className="
+                grid
+                size-7
+                shrink-0
+                place-items-center
+                rounded-full
+                bg-muted
+                text-muted-foreground
+                transition
+                hover:bg-primary
+                hover:text-primary-foreground
+              "
+              aria-label="Close minimum order notification"
+            >
+              <X size={15} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Welcome Popup */}
       {showWelcome && (

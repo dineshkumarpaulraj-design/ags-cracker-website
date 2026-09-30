@@ -1,32 +1,649 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, ChevronRight, MapPin, MessageCircle, Phone, Truck, Sparkles } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronRight,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Truck,
+  Sparkles,
+} from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/store/product-card';
-import { categories, LOCATION, PHONE, products, slides, whatsapp } from '@/lib/catalogue';
+import {
+  categories,
+  LOCATION,
+  PHONE,
+  products,
+  slides,
+  whatsapp,
+} from '@/lib/catalogue';
 
 export const Route = createFileRoute('/')({
-  head: () => ({ meta: [{ title: 'AGS CRACKER | Crackers & Fireworks | Virudhunagar' }, { name: 'description', content: 'AGS CRACKER – Explore a wide range of crackers, fireworks, festive offers and gift boxes in Virudhunagar.' }, { property: 'og:title', content: 'AGS CRACKER | Crackers & Fireworks | Virudhunagar' }, { property: 'og:description', content: 'Explore crackers, fireworks, festive offers and gift boxes at AGS CRACKER in Virudhunagar.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] }), component: Home,
+  head: () => ({
+    meta: [
+      {
+        title: 'AGS CRACKER | Crackers & Fireworks | Virudhunagar',
+      },
+      {
+        name: 'description',
+        content:
+          'AGS CRACKER – Explore a wide range of crackers, fireworks, festive offers and gift boxes in Virudhunagar.',
+      },
+      {
+        property: 'og:title',
+        content: 'AGS CRACKER | Crackers & Fireworks | Virudhunagar',
+      },
+      {
+        property: 'og:description',
+        content:
+          'Explore crackers, fireworks, festive offers and gift boxes at AGS CRACKER in Virudhunagar.',
+      },
+      { property: 'og:type', content: 'website' },
+      { name: 'twitter:card', content: 'summary_large_image' },
+    ],
+  }),
+  component: Home,
 });
+
 function Home() {
   const [slide, setSlide] = useState(0);
   const touchStart = useRef<number | null>(null);
-  useEffect(() => { const timer = window.setInterval(() => setSlide(s => (s + 1) % slides.length), 6000); return () => window.clearInterval(timer); }, []);
-  const move = (step: number) => setSlide(s => (s + step + slides.length) % slides.length);
+
+  useEffect(() => {
+    const timer = window.setInterval(
+      () => setSlide(s => (s + 1) % slides.length),
+      6000,
+    );
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const move = (step: number) =>
+    setSlide(s => (s + step + slides.length) % slides.length);
+
   const active = slides[slide] ?? slides[0];
-  const categoryImages = [slides[1].image, slides[2].image, slides[3].image] as const;
-  return <main>
-    <section className="relative h-[520px] overflow-hidden bg-navy sm:h-[590px] lg:h-[625px]" aria-label="Featured celebrations" onTouchStart={e => { touchStart.current = e.touches[0]?.clientX ?? null; }} onTouchEnd={e => { if (touchStart.current !== null && e.changedTouches[0] && Math.abs(e.changedTouches[0].clientX - touchStart.current) > 55) move(e.changedTouches[0].clientX < touchStart.current ? 1 : -1); touchStart.current = null; }}>
-      {slides.map((item, i) => <img key={item.title} src={item.image} alt={item.title} loading={i === 0 ? 'eager' : 'lazy'} fetchPriority={i === 0 ? 'high' : undefined} className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${i === slide ? 'opacity-100' : 'opacity-0'}`} />)}
-      <div className="hero-shade absolute inset-0" />
-      <div className="page-container relative flex h-full flex-col justify-center pb-12 text-secondary-foreground"><div key={slide} className="max-w-[580px] animate-in fade-in slide-in-from-bottom-3 duration-500"><p className="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.25em] text-gold"><span className="gold-rule" /> The season of celebration</p><h1 className="display-title max-w-[540px] text-[clamp(3.4rem,6vw,6.5rem)]">{active.title}</h1><p className="mt-5 max-w-md text-sm leading-7 text-secondary-foreground/85 sm:text-lg">{active.subtitle}</p><Button asChild variant="gold" size="lg" className="mt-8 h-12 px-7 text-sm font-bold"><Link to={active.url as '/products' | '/combo-offers'}>{active.cta} <ArrowRight /></Link></Button></div></div>
-      <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2">{slides.map((item, i) => <Button key={item.title} variant="ghost" size="icon" className="h-7 w-7 p-0 hover:bg-transparent" aria-label={`Go to slide ${i + 1}`} onClick={() => setSlide(i)}><span className={`block h-1.5 rounded-full transition-all ${i === slide ? 'w-7 bg-gold' : 'w-1.5 bg-secondary-foreground/60'}`} /></Button>)}</div>
-      <div className="absolute bottom-5 right-5 hidden gap-2 sm:flex lg:right-12"><Button variant="light" size="iconLg" aria-label="Previous slide" onClick={() => move(-1)}><ArrowLeft /></Button><Button variant="gold" size="iconLg" aria-label="Next slide" onClick={() => move(1)}><ArrowRight /></Button></div>
-    </section>
-    <section className="border-b border-border bg-card"><div className="page-container grid grid-cols-2 divide-x-0 gap-y-5 py-6 lg:grid-cols-4 lg:gap-y-0">{[{ icon: MapPin, label: 'Visit us', value: LOCATION, href: 'https://www.google.com/maps/search/?api=1&query=Virudhunagar%2C+Tamil+Nadu+626005' }, { icon: Phone, label: 'Call us', value: PHONE, href: `tel:+91${PHONE}` }, { icon: MessageCircle, label: 'WhatsApp', value: PHONE, href: whatsapp() }, { icon: Truck, label: 'Service', value: 'Fast & Reliable Service', href: '/contact' }].map(item => <a key={item.label} href={item.href} className="flex min-w-0 items-center gap-3 pr-3 hover:text-primary sm:gap-4 lg:border-l lg:border-border lg:pl-7 first:lg:border-0 first:lg:pl-0"><span className="grid size-10 shrink-0 place-items-center rounded-sm bg-muted text-primary sm:size-12"><item.icon size={20} /></span><span className="min-w-0"><span className="block text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{item.label}</span><span className="block text-xs font-bold leading-5 sm:text-sm">{item.value}</span></span></a>)}</div></section>
-    <section className="section-space overflow-hidden"><div className="page-container"><div className="flex items-end justify-between gap-4"><div><p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-primary">Find your spark</p><h2 className="display-title text-4xl text-navy sm:text-5xl">Shop by Category</h2></div><Button asChild variant="link" className="shrink-0 text-xs sm:text-sm"><Link to="/products">View all <ArrowRight /></Link></Button></div><div className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-5 sm:gap-5">{categories.map((name, i) => <Link key={name} to="/products" search={{ category: name }} className="group relative aspect-[0.85] w-[150px] shrink-0 snap-start overflow-hidden rounded-sm bg-navy sm:w-[205px]"><img src={categoryImages[i % categoryImages.length] ?? categoryImages[0]} alt={`${name} category`} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" /><span className="image-shade absolute inset-0" /><span className="absolute bottom-4 left-4 right-3 flex items-end justify-between gap-2 font-display text-xl font-bold leading-none text-secondary-foreground sm:text-2xl">{name}<ChevronRight size={17} className="shrink-0 text-gold" /></span></Link>)}</div></div></section>
-    <section className="section-space bg-muted"><div className="page-container"><div className="flex items-end justify-between gap-4"><div><p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-primary">Made for memorable moments</p><h2 className="display-title text-4xl text-navy sm:text-5xl">Featured Fireworks</h2><p className="mt-3 text-sm text-muted-foreground">Explore a selection of favourites. Contact us for current prices and availability.</p></div><Button asChild variant="link" className="hidden shrink-0 sm:inline-flex"><Link to="/products">Explore all <ArrowRight /></Link></Button></div><div className="mt-9 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-6">{products.map(product => <ProductCard key={product.slug} product={product} />)}</div></div></section>
-    <section className="relative overflow-hidden bg-navy"><img src={slides[1].image} alt="Festive fireworks gift selection" loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-60" /><div className="hero-shade absolute inset-0" /><div className="page-container relative py-16 text-secondary-foreground sm:py-24"><p className="text-xs font-bold uppercase tracking-[0.2em] text-gold">Celebrate together</p><h2 className="display-title mt-3 max-w-xl text-5xl sm:text-6xl">A celebration for everyone</h2><p className="mt-4 max-w-md text-sm leading-7 text-secondary-foreground/80">Looking for a festive assortment? Ask us about our Family, Kids, Premium, Budget and Festival combos.</p><Button asChild variant="gold" className="mt-7"><Link to="/combo-offers">Explore combo offers <ArrowRight /></Link></Button></div></section>
-    <section className="bg-card py-12"><div className="page-container flex flex-col items-start justify-between gap-6 md:flex-row md:items-center"><div className="flex items-start gap-4"><span className="grid size-12 shrink-0 place-items-center rounded-sm bg-muted text-primary"><Sparkles /></span><div><h2 className="display-title text-3xl text-navy sm:text-4xl">Bulk Orders Available</h2><p className="mt-1 text-sm text-muted-foreground">For Weddings | Functions | Corporate Gifting</p></div></div><Button asChild variant="navy" size="lg"><a href={whatsapp('Hi AGS CRACKER, I would like to enquire about a bulk order for a celebration. Please share the details.')} target="_blank" rel="noopener noreferrer">Contact Now <ArrowRight /></a></Button></div></section>
-  </main>;
+
+  const categoryImages = [
+    slides[1].image,
+    slides[2].image,
+    slides[3].image,
+  ] as const;
+
+  return (
+    <>
+      {/* Premium Sky Shot Animation */}
+      <style>{`
+        @keyframes ags-firework-burst {
+          0%, 40% {
+            transform: scale(0.05);
+            opacity: 0;
+          }
+          48% {
+            transform: scale(0.35);
+            opacity: 1;
+          }
+          62% {
+            transform: scale(1);
+            opacity: 0.9;
+          }
+          82% {
+            transform: scale(1.2);
+            opacity: 0.25;
+          }
+          100% {
+            transform: scale(1.35);
+            opacity: 0;
+          }
+        }
+
+        @keyframes ags-rocket-rise {
+          0%, 12% {
+            transform: translateY(90px);
+            opacity: 0;
+          }
+          18% {
+            opacity: 0.95;
+          }
+          45% {
+            transform: translateY(-190px);
+            opacity: 1;
+          }
+          50%, 100% {
+            transform: translateY(-190px);
+            opacity: 0;
+          }
+        }
+
+        .ags-firework {
+          position: absolute;
+          width: 92px;
+          height: 92px;
+          border-radius: 50%;
+          opacity: 0;
+          animation: ags-firework-burst 4.8s ease-out infinite;
+          filter: drop-shadow(0 0 9px rgba(255, 214, 74, .75));
+        }
+
+        .ags-firework::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background:
+            radial-gradient(
+              circle,
+              rgba(255,255,255,.95) 0 2px,
+              transparent 3px
+            ),
+            repeating-conic-gradient(
+              from 0deg,
+              rgba(255,214,74,.95) 0deg 3deg,
+              transparent 3deg 15deg
+            );
+        }
+
+        .ags-firework-1 {
+          top: 17%;
+          left: 22%;
+        }
+
+        .ags-firework-2 {
+          top: 13%;
+          right: 20%;
+          animation-delay: 1.5s;
+          filter: drop-shadow(0 0 9px rgba(255,90,110,.75));
+        }
+
+        .ags-firework-2::before {
+          background:
+            radial-gradient(
+              circle,
+              rgba(255,255,255,.95) 0 2px,
+              transparent 3px
+            ),
+            repeating-conic-gradient(
+              from 12deg,
+              rgba(255,100,125,.95) 0deg 3deg,
+              transparent 3deg 15deg
+            );
+        }
+
+        .ags-firework-3 {
+          top: 34%;
+          right: 8%;
+          width: 72px;
+          height: 72px;
+          animation-delay: 3s;
+          filter: drop-shadow(0 0 9px rgba(80,190,255,.75));
+        }
+
+        .ags-firework-3::before {
+          background:
+            radial-gradient(
+              circle,
+              rgba(255,255,255,.95) 0 2px,
+              transparent 3px
+            ),
+            repeating-conic-gradient(
+              from 4deg,
+              rgba(90,205,255,.95) 0deg 3deg,
+              transparent 3deg 14deg
+            );
+        }
+
+        .ags-firework-4 {
+          top: 27%;
+          left: 52%;
+          width: 64px;
+          height: 64px;
+          animation-delay: 3.8s;
+          filter: drop-shadow(0 0 9px rgba(130,255,120,.75));
+        }
+
+        .ags-firework-4::before {
+          background:
+            radial-gradient(
+              circle,
+              rgba(255,255,255,.95) 0 2px,
+              transparent 3px
+            ),
+            repeating-conic-gradient(
+              from 8deg,
+              rgba(150,255,120,.95) 0deg 3deg,
+              transparent 3deg 14deg
+            );
+        }
+
+        .ags-rocket {
+          position: absolute;
+          bottom: 2%;
+          width: 3px;
+          height: 44px;
+          border-radius: 999px;
+          opacity: 0;
+          background: linear-gradient(
+            to top,
+            transparent,
+            rgba(255,255,255,.95),
+            rgba(255,214,74,1)
+          );
+          box-shadow: 0 0 9px rgba(255,214,74,.8);
+          animation: ags-rocket-rise 4.8s ease-in infinite;
+        }
+
+        .ags-rocket-1 {
+          left: 27%;
+          animation-delay: .2s;
+        }
+
+        .ags-rocket-2 {
+          right: 24%;
+          animation-delay: 2s;
+        }
+
+        @media (max-width: 640px) {
+          .ags-firework {
+            width: 58px;
+            height: 58px;
+          }
+
+          .ags-firework-3,
+          .ags-firework-4 {
+            width: 48px;
+            height: 48px;
+          }
+
+          .ags-firework-1 {
+            left: 10%;
+          }
+
+          .ags-firework-2 {
+            right: 7%;
+          }
+
+          .ags-rocket-1 {
+            left: 18%;
+          }
+
+          .ags-rocket-2 {
+            right: 14%;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .ags-firework,
+          .ags-rocket {
+            animation: none;
+            opacity: 0;
+          }
+        }
+      `}</style>
+
+      <main>
+        <section
+          className="relative h-[520px] overflow-hidden bg-navy sm:h-[590px] lg:h-[625px]"
+          aria-label="Featured celebrations"
+          onTouchStart={e => {
+            touchStart.current =
+              e.touches[0]?.clientX ?? null;
+          }}
+          onTouchEnd={e => {
+            if (
+              touchStart.current !== null &&
+              e.changedTouches[0] &&
+              Math.abs(
+                e.changedTouches[0].clientX -
+                  touchStart.current,
+              ) > 55
+            ) {
+              move(
+                e.changedTouches[0].clientX <
+                  touchStart.current
+                  ? 1
+                  : -1,
+              );
+            }
+
+            touchStart.current = null;
+          }}
+        >
+          {slides.map((item, i) => (
+            <img
+              key={item.title}
+              src={item.image}
+              alt={item.title}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchPriority={
+                i === 0 ? 'high' : undefined
+              }
+              className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${
+                i === slide
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              }`}
+            />
+          ))}
+
+          <div className="hero-shade absolute inset-0" />
+
+          {/* Animated Sky Shots */}
+          <div
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+            aria-hidden="true"
+          >
+            <div className="ags-firework ags-firework-1" />
+            <div className="ags-firework ags-firework-2" />
+            <div className="ags-firework ags-firework-3" />
+            <div className="ags-firework ags-firework-4" />
+            <div className="ags-rocket ags-rocket-1" />
+            <div className="ags-rocket ags-rocket-2" />
+          </div>
+
+          <div className="page-container relative flex h-full flex-col justify-center pb-12 text-secondary-foreground">
+            <div
+              key={slide}
+              className="max-w-[580px] animate-in fade-in slide-in-from-bottom-3 duration-500"
+            >
+              <p className="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.25em] text-gold">
+                <span className="gold-rule" />
+                The season of celebration
+              </p>
+
+              <h1 className="display-title max-w-[540px] text-[clamp(3.4rem,6vw,6.5rem)]">
+                {active.title}
+              </h1>
+
+              <p className="mt-5 max-w-md text-sm leading-7 text-secondary-foreground/85 sm:text-lg">
+                {active.subtitle}
+              </p>
+
+              <Button
+                asChild
+                variant="gold"
+                size="lg"
+                className="mt-8 h-12 px-7 text-sm font-bold"
+              >
+                <Link
+                  to={
+                    active.url as
+                      | '/products'
+                      | '/combo-offers'
+                  }
+                >
+                  {active.cta}
+                  <ArrowRight />
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2">
+            {slides.map((item, i) => (
+              <Button
+                key={item.title}
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 p-0 hover:bg-transparent"
+                aria-label={`Go to slide ${i + 1}`}
+                onClick={() => setSlide(i)}
+              >
+                <span
+                  className={`block h-1.5 rounded-full transition-all ${
+                    i === slide
+                      ? 'w-7 bg-gold'
+                      : 'w-1.5 bg-secondary-foreground/60'
+                  }`}
+                />
+              </Button>
+            ))}
+          </div>
+
+          <div className="absolute bottom-5 right-5 hidden gap-2 sm:flex lg:right-12">
+            <Button
+              variant="light"
+              size="iconLg"
+              aria-label="Previous slide"
+              onClick={() => move(-1)}
+            >
+              <ArrowLeft />
+            </Button>
+
+            <Button
+              variant="gold"
+              size="iconLg"
+              aria-label="Next slide"
+              onClick={() => move(1)}
+            >
+              <ArrowRight />
+            </Button>
+          </div>
+        </section>
+
+        <section className="border-b border-border bg-card">
+          <div className="page-container grid grid-cols-2 gap-y-5 py-6 lg:grid-cols-4 lg:gap-y-0">
+            {[
+              {
+                icon: MapPin,
+                label: 'Visit us',
+                value: LOCATION,
+                href: 'https://www.google.com/maps/search/?api=1&query=Virudhunagar%2C+Tamil+Nadu+626005',
+              },
+              {
+                icon: Phone,
+                label: 'Call us',
+                value: PHONE,
+                href: `tel:+91${PHONE}`,
+              },
+              {
+                icon: MessageCircle,
+                label: 'WhatsApp',
+                value: PHONE,
+                href: whatsapp(),
+              },
+              {
+                icon: Truck,
+                label: 'Service',
+                value: 'Fast & Reliable Service',
+                href: '/contact',
+              },
+            ].map(item => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="flex min-w-0 items-center gap-3 pr-3 hover:text-primary sm:gap-4 lg:border-l lg:border-border lg:pl-7 first:lg:border-0 first:lg:pl-0"
+              >
+                <span className="grid size-10 shrink-0 place-items-center rounded-sm bg-muted text-primary sm:size-12">
+                  <item.icon size={20} />
+                </span>
+
+                <span className="min-w-0">
+                  <span className="block text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    {item.label}
+                  </span>
+                  <span className="block text-xs font-bold leading-5 sm:text-sm">
+                    {item.value}
+                  </span>
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        <section className="section-space overflow-hidden">
+          <div className="page-container">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                  Find your spark
+                </p>
+                <h2 className="display-title text-4xl text-navy sm:text-5xl">
+                  Shop by Category
+                </h2>
+              </div>
+
+              <Button
+                asChild
+                variant="link"
+                className="shrink-0 text-xs sm:text-sm"
+              >
+                <Link to="/products">
+                  View all
+                  <ArrowRight />
+                </Link>
+              </Button>
+            </div>
+
+            <div className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-5 sm:gap-5">
+              {categories.map((name, i) => (
+                <Link
+                  key={name}
+                  to="/products"
+                  search={{ category: name }}
+                  className="group relative aspect-[0.85] w-[150px] shrink-0 snap-start overflow-hidden rounded-sm bg-navy sm:w-[205px]"
+                >
+                  <img
+                    src={
+                      categoryImages[
+                        i % categoryImages.length
+                      ] ?? categoryImages[0]
+                    }
+                    alt={`${name} category`}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+
+                  <span className="image-shade absolute inset-0" />
+
+                  <span className="absolute bottom-4 left-4 right-3 flex items-end justify-between gap-2 font-display text-xl font-bold leading-none text-secondary-foreground sm:text-2xl">
+                    {name}
+                    <ChevronRight
+                      size={17}
+                      className="shrink-0 text-gold"
+                    />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section-space bg-muted">
+          <div className="page-container">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                  Made for memorable moments
+                </p>
+
+                <h2 className="display-title text-4xl text-navy sm:text-5xl">
+                  Featured Fireworks
+                </h2>
+
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Explore a selection of favourites. Contact us for current prices and availability.
+                </p>
+              </div>
+
+              <Button
+                asChild
+                variant="link"
+                className="hidden shrink-0 sm:inline-flex"
+              >
+                <Link to="/products">
+                  Explore all
+                  <ArrowRight />
+                </Link>
+              </Button>
+            </div>
+
+            <div className="mt-9 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-6">
+              {products.map(product => (
+                <ProductCard
+                  key={product.slug}
+                  product={product}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="relative overflow-hidden bg-navy">
+          <img
+            src={slides[1].image}
+            alt="Festive fireworks gift selection"
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover opacity-60"
+          />
+
+          <div className="hero-shade absolute inset-0" />
+
+          <div className="page-container relative py-16 text-secondary-foreground sm:py-24">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold">
+              Celebrate together
+            </p>
+
+            <h2 className="display-title mt-3 max-w-xl text-5xl sm:text-6xl">
+              A celebration for everyone
+            </h2>
+
+            <p className="mt-4 max-w-md text-sm leading-7 text-secondary-foreground/80">
+              Looking for a festive assortment? Ask us about our Family, Kids, Premium, Budget and Festival combos.
+            </p>
+
+            <Button
+              asChild
+              variant="gold"
+              className="mt-7"
+            >
+              <Link to="/combo-offers">
+                Explore combo offers
+                <ArrowRight />
+              </Link>
+            </Button>
+          </div>
+        </section>
+
+        <section className="bg-card py-12">
+          <div className="page-container flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+            <div className="flex items-start gap-4">
+              <span className="grid size-12 shrink-0 place-items-center rounded-sm bg-muted text-primary">
+                <Sparkles />
+              </span>
+
+              <div>
+                <h2 className="display-title text-3xl text-navy sm:text-4xl">
+                  Bulk Orders Available
+                </h2>
+
+                <p className="mt-1 text-sm text-muted-foreground">
+                  For Weddings | Functions | Corporate Gifting
+                </p>
+              </div>
+            </div>
+
+            <Button
+              asChild
+              variant="navy"
+              size="lg"
+            >
+              <a
+                href={whatsapp(
+                  'Hi AGS CRACKER, I would like to enquire about a bulk order for a celebration. Please share the details.',
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Contact Now
+                <ArrowRight />
+              </a>
+            </Button>
+          </div>
+        </section>
+      </main>
+    </>
+  );
 }
