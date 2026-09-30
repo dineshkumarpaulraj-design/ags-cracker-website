@@ -43,8 +43,8 @@ function WelcomePopup({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-card shadow-2xl">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/25 p-3 sm:p-4">
+      <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-card shadow-2xl">
         {/* Top decorative line */}
         <div className="h-1.5 bg-primary" />
 
@@ -58,9 +58,9 @@ function WelcomePopup({
           <X size={19} />
         </button>
 
-        <div className="p-6 sm:p-8">
+        <div className="p-4 sm:p-6">
           {/* Icon */}
-          <div className="mx-auto grid size-16 place-items-center rounded-full bg-navy text-gold shadow-lg">
+          <div className="mx-auto grid size-14 place-items-center rounded-full bg-navy text-gold shadow-lg">
             <Sparkles size={30} />
           </div>
 
@@ -69,7 +69,7 @@ function WelcomePopup({
               Welcome to
             </p>
 
-            <h2 className="mt-1 font-display text-3xl font-bold text-navy sm:text-4xl">
+            <h2 className="mt-1 font-display text-2xl font-bold text-navy sm:text-3xl">
               AGS <span className="text-primary">CRACKERS</span>
             </h2>
 
@@ -78,7 +78,7 @@ function WelcomePopup({
             </p>
           </div>
 
-          <div className="mt-6 rounded-xl border border-border bg-muted/40 p-4">
+          <div className="mt-4 rounded-xl border border-border bg-muted/40 p-3">
             <p className="text-center text-sm leading-6 text-foreground">
               Explore our crackers collection, check the prices,
               prepare your enquiry and send the PDF to us on WhatsApp.
@@ -86,7 +86,7 @@ function WelcomePopup({
           </div>
 
           {/* Steps */}
-          <div className="mt-5 space-y-3">
+          <div className="mt-4 space-y-2.5">
             {[
               'Browse and select your favourite crackers.',
               'Add the products to your cart.',
@@ -109,7 +109,7 @@ function WelcomePopup({
             ))}
           </div>
 
-          <div className="mt-6 rounded-xl border border-primary/30 bg-primary/5 p-4">
+          <div className="mt-4 rounded-xl border border-primary/30 bg-primary/5 p-3">
             <p className="text-center text-xs leading-5 text-muted-foreground">
               Our team will check your enquiry and contact you
               to confirm product availability, final price and
@@ -120,7 +120,7 @@ function WelcomePopup({
           <Button
             type="button"
             variant="navy"
-            className="mt-6 h-12 w-full"
+            className="mt-4 h-11 w-full"
             onClick={onClose}
           >
             Continue Shopping
@@ -146,7 +146,7 @@ function PdfSuccessPopup({
   const whatsappUrl = whatsapp();
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/25 p-3 sm:p-4">
       <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-card shadow-2xl">
         <div className="h-1.5 bg-success" />
 
