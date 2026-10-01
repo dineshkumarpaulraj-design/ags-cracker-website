@@ -520,6 +520,91 @@ async function jpegDimensions(
   }
 }
 
+/* Create a light JPEG watermark so the photo stays behind the PDF content. */
+async function createWatermarkJpeg(
+  url: string,
+  opacity = 0.14,
+) {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(
+      'Unable to load the Grandpa watermark image.',
+    );
+  }
+
+  const blob = await response.blob();
+  const objectUrl = URL.createObjectURL(blob);
+
+  try {
+    const image = new Image();
+    image.src = objectUrl;
+    await image.decode();
+
+    const maxDimension = 1600;
+    const scale = Math.min(
+      1,
+      maxDimension / Math.max(image.naturalWidth, image.naturalHeight),
+    );
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(
+      1,
+      Math.round(image.naturalWidth * scale),
+    );
+    canvas.height = Math.max(
+      1,
+      Math.round(image.naturalHeight * scale),
+    );
+
+    const context = canvas.getContext('2d');
+
+    if (!context) {
+      throw new Error(
+        'Unable to prepare the Grandpa watermark image.',
+      );
+    }
+
+    context.fillStyle = '#ffffff';
+    context.fillRect(
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
+
+    context.globalAlpha = opacity;
+    context.drawImage(
+      image,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
+
+    const watermarkBlob = await new Promise<Blob | null>(
+      (resolve) =>
+        canvas.toBlob(
+          resolve,
+          'image/jpeg',
+          0.88,
+        ),
+    );
+
+    if (!watermarkBlob) {
+      throw new Error(
+        'Unable to create the Grandpa watermark image.',
+      );
+    }
+
+    return new Uint8Array(
+      await watermarkBlob.arrayBuffer(),
+    );
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 /* Split the customer address into PDF-safe lines (no truncation). */
 function wrapAddress(value: string, maxChars = 50): string[] {
   const words = value.trim().replace(/\s+/g, ' ').split(' ');
@@ -548,14 +633,20 @@ function wrapAddress(value: string, maxChars = 50): string[] {
    DOWNLOAD ORDER PDF
    ============================================================ */
 
-async function createOrderPdf(
+export type PreparedOrderPdf = {
+  blob: Blob;
+  fileName: string;
+  orderNo: string;
+};
+
+export async function prepareOrderPdf(
   args: {
     rows: PdfRow[];
     customerName: string;
     mobile: string;
     address: string;
   },
-) {
+): Promise<PreparedOrderPdf> {
   if (!args.customerName.trim()) {
     throw new Error('Customer name is required.');
   }
@@ -583,6 +674,21 @@ async function createOrderPdf(
   const headerSize =
     await jpegDimensions(
       header,
+    );
+
+  /* ==========================================================
+     LOAD GRANDPA WATERMARK
+     ========================================================== */
+
+  const grandpaWatermark =
+    await createWatermarkJpeg(
+      '/images/grandpa-watermark.jpeg',
+      0.14,
+    );
+
+  const grandpaWatermarkSize =
+    await jpegDimensions(
+      grandpaWatermark,
     );
 
   /* ==========================================================
@@ -720,6 +826,22 @@ async function createOrderPdf(
       1,
       1,
     );
+
+    /* ========================================================
+       GRANDPA WATERMARK BACKGROUND
+       ======================================================== */
+
+    c += `
+q
+${PAGE_W.toFixed(
+  2,
+)} 0 0 ${PAGE_H.toFixed(
+      2,
+    )}
+0 0 cm
+/Im2 Do
+Q
+`;
 
     /* ========================================================
        HEADER IMAGE
@@ -1464,8 +1586,11 @@ Q
   const imageObject =
     fontBold + 1;
 
+  const watermarkObject =
+    imageObject + 1;
+
   const objectCount =
-    imageObject;
+    watermarkObject;
 
   /* ==========================================================
      PDF HEADER
@@ -1539,6 +1664,7 @@ Q
             `>> ` +
             `/XObject << ` +
             `/Im1 ${imageObject} 0 R ` +
+            `/Im2 ${watermarkObject} 0 R ` +
             `>> ` +
             `>> ` +
             `/Contents ${contentObject} 0 R >>\n` +
@@ -1610,6 +1736,30 @@ Q
           `stream\n`,
       ),
       header,
+      ascii(
+        `\nendstream\nendobj\n`,
+      ),
+    ]),
+  );
+
+  /* Grandpa watermark image */
+
+  objectMap.set(
+    watermarkObject,
+    concatBytes([
+      ascii(
+        `${watermarkObject} 0 obj\n` +
+          `<< /Type /XObject ` +
+          `/Subtype /Image ` +
+          `/Width ${grandpaWatermarkSize.width} ` +
+          `/Height ${grandpaWatermarkSize.height} ` +
+          `/ColorSpace /DeviceRGB ` +
+          `/BitsPerComponent 8 ` +
+          `/Filter /DCTDecode ` +
+          `/Length ${grandpaWatermark.length} >>\n` +
+          `stream\n`,
+      ),
+      grandpaWatermark,
       ascii(
         `\nendstream\nendobj\n`,
       ),
@@ -1713,54 +1863,89 @@ Q
 
   return {
     blob,
-    orderNo,
     fileName: `${orderNo}-AGS-CRACKERS-Order.pdf`,
+    orderNo,
   };
 }
 
 /* ============================================================
-   PREPARE / DOWNLOAD / SHARE ORDER PDF
+   DOWNLOAD PREPARED PDF
    ============================================================ */
-
-export type PreparedOrderPdf = {
-  blob: Blob;
-  orderNo: string;
-  fileName: string;
-};
-
-export async function prepareOrderPdf(
-  args: {
-    rows: PdfRow[];
-    customerName: string;
-    mobile: string;
-    address: string;
-  },
-): Promise<PreparedOrderPdf> {
-  return createOrderPdf(args);
-}
 
 export function downloadPreparedOrderPdf(
   prepared: PreparedOrderPdf,
 ) {
-  const url = URL.createObjectURL(prepared.blob);
+  const url =
+    URL.createObjectURL(prepared.blob);
 
-  const anchor = document.createElement('a');
+  const anchor =
+    document.createElement('a');
+
   anchor.href = url;
   anchor.download = prepared.fileName;
+
   document.body.appendChild(anchor);
   anchor.click();
-  anchor.remove();
 
   window.dispatchEvent(
     new CustomEvent('ags-order-pdf-downloaded', {
-      detail: { orderNo: prepared.orderNo },
+      detail: {
+        orderNo: prepared.orderNo,
+      },
     }),
   );
 
-  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  anchor.remove();
 
-  return prepared.orderNo;
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 1500);
 }
+
+/* ============================================================
+   SHARE PREPARED PDF
+   ============================================================ */
+
+export async function sharePreparedOrderPdf(
+  prepared: PreparedOrderPdf,
+) {
+  if (
+    typeof navigator === 'undefined' ||
+    typeof navigator.share !== 'function'
+  ) {
+    throw new Error(
+      'PDF sharing is not supported in this browser. Please use Download Order PDF.',
+    );
+  }
+
+  const file = new File(
+    [prepared.blob],
+    prepared.fileName,
+    {
+      type: 'application/pdf',
+    },
+  );
+
+  if (
+    typeof navigator.canShare === 'function' &&
+    !navigator.canShare({ files: [file] })
+  ) {
+    throw new Error(
+      'This browser cannot share PDF files. Please use Download Order PDF.',
+    );
+  }
+
+  await navigator.share({
+    title: `${prepared.orderNo} - AGS CRACKERS`,
+    text: `AGS CRACKERS Order ${prepared.orderNo}`,
+    files: [file],
+  });
+}
+
+/* ============================================================
+   DOWNLOAD ORDER PDF
+   Backward-compatible wrapper for existing callers.
+   ============================================================ */
 
 export async function downloadOrderPdf(
   args: {
@@ -1770,70 +1955,10 @@ export async function downloadOrderPdf(
     address: string;
   },
 ) {
-  const prepared = await createOrderPdf(args);
-  return downloadPreparedOrderPdf(prepared);
-}
+  const prepared =
+    await prepareOrderPdf(args);
 
-/**
- * IMPORTANT: call this only after the PDF has already been prepared.
- * Web Share requires a live user gesture. Awaiting PDF generation inside
- * the click handler can lose that gesture and causes
- * "Must be handling a user gesture" errors.
- */
-export async function sharePreparedOrderPdf(
-  prepared: PreparedOrderPdf,
-) {
-  if (typeof navigator === 'undefined' || !navigator.share) {
-    throw new Error(
-      'PDF sharing is not supported on this browser. Please use Download Order PDF.',
-    );
-  }
+  downloadPreparedOrderPdf(prepared);
 
-  const file = new File(
-    [prepared.blob],
-    prepared.fileName,
-    { type: 'application/pdf' },
-  );
-
-  if (
-    typeof navigator.canShare === 'function' &&
-    !navigator.canShare({ files: [file] })
-  ) {
-    throw new Error(
-      'This device/browser cannot share PDF files. Please use Download Order PDF.',
-    );
-  }
-
-  try {
-    await navigator.share({
-      title: 'AGS CRACKERS Order Enquiry',
-      text: `AGS CRACKERS Order Enquiry - ${prepared.orderNo}`,
-      files: [file],
-    });
-
-    return prepared.orderNo;
-  } catch (error) {
-    if (
-      error instanceof DOMException &&
-      error.name === 'AbortError'
-    ) {
-      return prepared.orderNo;
-    }
-
-    throw error;
-  }
-}
-
-export async function shareOrderPdf(
-  args: {
-    rows: PdfRow[];
-    customerName: string;
-    mobile: string;
-    address: string;
-  },
-) {
-  // Kept for compatibility. Direct sharing after async generation is not
-  // guaranteed because the browser may clear the user activation.
-  const prepared = await createOrderPdf(args);
-  return sharePreparedOrderPdf(prepared);
+  return prepared;
 }
