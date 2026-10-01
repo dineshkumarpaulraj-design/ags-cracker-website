@@ -7,6 +7,7 @@ import {
   Minus,
   Plus,
   ShoppingBag,
+  Share2,
   Trash2,
 } from 'lucide-react';
 
@@ -14,7 +15,13 @@ import { Button } from '@/components/ui/button';
 import { PageIntro } from '@/components/store/site';
 import { useCart } from '@/lib/cart';
 import { priceText, whatsapp } from '@/lib/catalogue';
-import { downloadOrderPdf } from '@/lib/order-pdf';
+import {
+  downloadOrderPdf,
+  downloadPreparedOrderPdf,
+  prepareOrderPdf,
+  sharePreparedOrderPdf,
+  type PreparedOrderPdf,
+} from '@/lib/order-pdf';
 
 export const Route = createFileRoute('/cart')({
   head: () => ({
@@ -49,6 +56,9 @@ function Cart() {
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');
   const [pdfBusy, setPdfBusy] = useState(false);
+  const [pdfShareBusy, setPdfShareBusy] = useState(false);
+  const [preparedPdf, setPreparedPdf] = useState<PreparedOrderPdf | null>(null);
+  const [preparedPdfKey, setPreparedPdfKey] = useState('');
 
   const rows = useMemo(
     () =>
@@ -109,6 +119,20 @@ function Cart() {
       row.product.price != null,
   );
 
+  const pdfRequestKey = useMemo(
+    () =>
+      JSON.stringify({
+        name: name.trim(),
+        mobile: mobile.replace(/\D/g, ''),
+        address: address.trim(),
+        rows: rows.map((row) => ({
+          slug: row.product.slug,
+          quantity: row.quantity,
+        })),
+      }),
+    [name, mobile, address, rows],
+  );
+
   const validate = () => {
     if (!name.trim()) {
       setError(
@@ -150,12 +174,15 @@ function Cart() {
     setError('');
 
     try {
+      if (preparedPdf && preparedPdfKey === pdfRequestKey) {
+        downloadPreparedOrderPdf(preparedPdf);
+        return;
+      }
+
       await downloadOrderPdf({
         rows,
-        customerName:
-          name.trim(),
-        mobile:
-          mobile.replace(/\D/g, ''),
+        customerName: name.trim(),
+        mobile: mobile.replace(/\D/g, ''),
         address: address.trim(),
       });
     } catch (e) {
@@ -166,6 +193,57 @@ function Cart() {
       );
     } finally {
       setPdfBusy(false);
+    }
+  };
+
+  const sharePdf = async () => {
+    if (!validate()) return;
+
+    // IMPORTANT: the browser requires navigator.share() to run directly
+    // from a fresh user gesture. Do not await PDF generation before share().
+    if (preparedPdf && preparedPdfKey === pdfRequestKey) {
+      try {
+        setError('');
+        // This is intentionally called before any await.
+        await sharePreparedOrderPdf(preparedPdf);
+      } catch (e) {
+        console.error(e);
+
+        setError(
+          e instanceof Error
+            ? e.message
+            : 'Could not share the PDF. Please try again.',
+        );
+      }
+      return;
+    }
+
+    setPdfShareBusy(true);
+    setError('');
+
+    try {
+      const prepared = await prepareOrderPdf({
+        rows,
+        customerName: name.trim(),
+        mobile: mobile.replace(/\D/g, ''),
+        address: address.trim(),
+      });
+
+      setPreparedPdf(prepared);
+      setPreparedPdfKey(pdfRequestKey);
+      setError(
+        'PDF is ready. Tap “Share PDF on WhatsApp” again to share it.',
+      );
+    } catch (e) {
+      console.error(e);
+
+      setError(
+        e instanceof Error
+          ? e.message
+          : 'Could not prepare the PDF. Please try again.',
+      );
+    } finally {
+      setPdfShareBusy(false);
     }
   };
 
@@ -448,6 +526,8 @@ function Cart() {
                   setName(
                     e.target.value,
                   );
+                  setPreparedPdf(null);
+                  setPreparedPdfKey('');
                   setError('');
                 }}
                 placeholder="Your name"
@@ -480,6 +560,8 @@ function Cart() {
                       );
 
                   setMobile(value);
+                  setPreparedPdf(null);
+                  setPreparedPdfKey('');
                   setError('');
                 }}
                 placeholder="10-digit mobile number"
@@ -500,6 +582,8 @@ function Cart() {
                 rows={4}
                 onChange={(e) => {
                   setAddress(e.target.value);
+                  setPreparedPdf(null);
+                  setPreparedPdfKey('');
                   setError('');
                 }}
                 placeholder="Door no., street, area, city, pincode"
@@ -520,7 +604,7 @@ function Cart() {
                 size="lg"
                 className="mt-4 w-full"
                 onClick={downloadPdf}
-                disabled={pdfBusy}
+                disabled={pdfBusy || pdfShareBusy}
               >
                 <Download />
                 {pdfBusy
@@ -532,7 +616,23 @@ function Cart() {
                 variant="outline"
                 size="lg"
                 className="mt-3 w-full"
+                onClick={sharePdf}
+                disabled={pdfBusy || pdfShareBusy}
+              >
+                <Share2 />
+                {pdfShareBusy
+                  ? 'Preparing PDF...'
+                  : preparedPdf && preparedPdfKey === pdfRequestKey
+                    ? 'Share PDF on WhatsApp'
+                    : 'Prepare PDF for WhatsApp'}
+              </Button>
+
+              <Button
+                variant="outline"
+                size="lg"
+                className="mt-3 w-full"
                 onClick={order}
+                disabled={pdfBusy || pdfShareBusy}
               >
                 <MessageCircle />
                 Order on WhatsApp

@@ -548,7 +548,7 @@ function wrapAddress(value: string, maxChars = 50): string[] {
    DOWNLOAD ORDER PDF
    ============================================================ */
 
-export async function downloadOrderPdf(
+async function createOrderPdf(
   args: {
     rows: PdfRow[];
     customerName: string;
@@ -791,8 +791,37 @@ Q
     );
 
     /* ========================================================
-       CUSTOMER DETAILS
+       SHOP + CUSTOMER DETAILS
        ======================================================== */
+
+    /* --------------------------------------------------------
+       LEFT SIDE - SHOP DETAILS
+       -------------------------------------------------------- */
+
+    c += bold(
+      'AGS CRACKERS',
+      ORDER_TITLE_X,
+      600.55,
+      8.2,
+    );
+
+    c += pdfLine(
+      'Sivakasi to Virudhunagar Main Road - 626005',
+      ORDER_TITLE_X,
+      588.55,
+      8.2,
+    );
+
+    c += pdfLine(
+      'Shop Mobile: 9840023543 / 9629131619',
+      ORDER_TITLE_X,
+      576.55,
+      8.2,
+    );
+
+    /* --------------------------------------------------------
+       RIGHT SIDE - CUSTOMER DETAILS
+       -------------------------------------------------------- */
 
     c += bold(
       `Customer: ${args.customerName.trim()}`,
@@ -801,39 +830,29 @@ Q
       8.2,
     );
 
-    c += pdfLine(
-      'AGS CRACKERS',
-      CUSTOMER_X,
-      638.55,
-      8.2,
-    );
-
-    c += pdfLine(
-      'Sivakasi to Virudhunagar Main Road - 626005',
-      CUSTOMER_X,
-      628.55,
-      8.2,
-    );
-
-    // Shop contact stays in the header; customer details are below it.
-    c += pdfLine(
-      'Shop Mobile: 9840023543 / 9629131619',
-      CUSTOMER_X,
-      618.55,
-      8.2,
-    );
-
     c += bold(
       `Customer Mobile: ${args.mobile.trim()}`,
       CUSTOMER_X,
-      606.55,
+      636.48,
       8.2,
     );
 
     const addressLines = wrapAddress(args.address);
-    c += bold('Address:', CUSTOMER_X, 594.55, 8.2);
+
+    c += bold(
+      'Address:',
+      CUSTOMER_X,
+      624.48,
+      8.2,
+    );
+
     addressLines.forEach((line, index) => {
-      c += pdfLine(line, CUSTOMER_X, 583.55 - index * 11, 8.2);
+      c += pdfLine(
+        line,
+        CUSTOMER_X,
+        612.48 - index * 11,
+        8.2,
+      );
     });
 
     /* ========================================================
@@ -841,10 +860,7 @@ Q
        ======================================================== */
 
     // Shift table down if the address needs more than four lines.
-    const tableTop =
-      TABLE_TOP -
-      Math.max(0, addressLines.length - 4) * 11 -
-      18;
+    const tableTop = TABLE_TOP - Math.max(0, addressLines.length - 4) * 11;
     const tableHeaderBottom =
       tableTop -
       TABLE_HEADER_H;
@@ -1695,46 +1711,129 @@ Q
       },
     );
 
-  /* ==========================================================
-     DOWNLOAD
-     ========================================================== */
+  return {
+    blob,
+    orderNo,
+    fileName: `${orderNo}-AGS-CRACKERS-Order.pdf`,
+  };
+}
 
-  const url =
-    URL.createObjectURL(blob);
+/* ============================================================
+   PREPARE / DOWNLOAD / SHARE ORDER PDF
+   ============================================================ */
 
-  const anchor =
-    document.createElement(
-      'a',
-    );
+export type PreparedOrderPdf = {
+  blob: Blob;
+  orderNo: string;
+  fileName: string;
+};
 
-  anchor.href =
-    url;
+export async function prepareOrderPdf(
+  args: {
+    rows: PdfRow[];
+    customerName: string;
+    mobile: string;
+    address: string;
+  },
+): Promise<PreparedOrderPdf> {
+  return createOrderPdf(args);
+}
 
-  anchor.download =
-    `${orderNo}-AGS-CRACKERS-Order.pdf`;
+export function downloadPreparedOrderPdf(
+  prepared: PreparedOrderPdf,
+) {
+  const url = URL.createObjectURL(prepared.blob);
 
-  document.body.appendChild(
-    anchor,
-  );
-
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = prepared.fileName;
+  document.body.appendChild(anchor);
   anchor.click();
+  anchor.remove();
 
   window.dispatchEvent(
     new CustomEvent('ags-order-pdf-downloaded', {
-      detail: {
-        orderNo,
-      },
+      detail: { orderNo: prepared.orderNo },
     }),
   );
 
-  anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
 
-  setTimeout(
-    () => {
-      URL.revokeObjectURL(
-        url,
-      );
-    },
-    1500,
+  return prepared.orderNo;
+}
+
+export async function downloadOrderPdf(
+  args: {
+    rows: PdfRow[];
+    customerName: string;
+    mobile: string;
+    address: string;
+  },
+) {
+  const prepared = await createOrderPdf(args);
+  return downloadPreparedOrderPdf(prepared);
+}
+
+/**
+ * IMPORTANT: call this only after the PDF has already been prepared.
+ * Web Share requires a live user gesture. Awaiting PDF generation inside
+ * the click handler can lose that gesture and causes
+ * "Must be handling a user gesture" errors.
+ */
+export async function sharePreparedOrderPdf(
+  prepared: PreparedOrderPdf,
+) {
+  if (typeof navigator === 'undefined' || !navigator.share) {
+    throw new Error(
+      'PDF sharing is not supported on this browser. Please use Download Order PDF.',
+    );
+  }
+
+  const file = new File(
+    [prepared.blob],
+    prepared.fileName,
+    { type: 'application/pdf' },
   );
+
+  if (
+    typeof navigator.canShare === 'function' &&
+    !navigator.canShare({ files: [file] })
+  ) {
+    throw new Error(
+      'This device/browser cannot share PDF files. Please use Download Order PDF.',
+    );
+  }
+
+  try {
+    await navigator.share({
+      title: 'AGS CRACKERS Order Enquiry',
+      text: `AGS CRACKERS Order Enquiry - ${prepared.orderNo}`,
+      files: [file],
+    });
+
+    return prepared.orderNo;
+  } catch (error) {
+    if (
+      error instanceof DOMException &&
+      error.name === 'AbortError'
+    ) {
+      return prepared.orderNo;
+    }
+
+    throw error;
+  }
+}
+
+export async function shareOrderPdf(
+  args: {
+    rows: PdfRow[];
+    customerName: string;
+    mobile: string;
+    address: string;
+  },
+) {
+  // Kept for compatibility. Direct sharing after async generation is not
+  // guaranteed because the browser may clear the user activation.
+  const prepared = await createOrderPdf(args);
+  return sharePreparedOrderPdf(prepared);
 }
