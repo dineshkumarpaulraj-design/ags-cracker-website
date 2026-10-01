@@ -94,11 +94,7 @@ const FOOTER_COLOR = [
   99 / 255,
 ] as const;
 
-const TABLE_HEADER_FILL = [
-  0.952941,
-  0.956863,
-  0.964706,
-] as const;
+
 
 /* Pure black table borders */
 const TABLE_BORDER = [
@@ -119,16 +115,12 @@ const SUMMARY_BORDER = [
   0,
 ] as const;
 
-const NOTE_FILL = [
-  1.0,
-  0.968627,
-  0.929412,
-] as const;
+
 
 const NOTE_BORDER = [
-  0.992157,
-  0.729412,
-  0.454902,
+  1,
+  1,
+  1,
 ] as const;
 
 /* ============================================================
@@ -520,7 +512,7 @@ async function jpegDimensions(
   }
 }
 
-/* Create a light JPEG watermark so the photo stays behind the PDF content. */
+/* Create a light circular JPEG watermark for the PDF center. */
 async function createWatermarkJpeg(
   url: string,
   opacity = 0.14,
@@ -541,21 +533,10 @@ async function createWatermarkJpeg(
     image.src = objectUrl;
     await image.decode();
 
-    const maxDimension = 1600;
-    const scale = Math.min(
-      1,
-      maxDimension / Math.max(image.naturalWidth, image.naturalHeight),
-    );
-
+    const size = 1400;
     const canvas = document.createElement('canvas');
-    canvas.width = Math.max(
-      1,
-      Math.round(image.naturalWidth * scale),
-    );
-    canvas.height = Math.max(
-      1,
-      Math.round(image.naturalHeight * scale),
-    );
+    canvas.width = size;
+    canvas.height = size;
 
     const context = canvas.getContext('2d');
 
@@ -566,30 +547,70 @@ async function createWatermarkJpeg(
     }
 
     context.fillStyle = '#ffffff';
-    context.fillRect(
+    context.fillRect(0, 0, size, size);
+
+    const radius = size * 0.44;
+    const center = size / 2;
+
+    context.save();
+    context.beginPath();
+    context.arc(
+      center,
+      center,
+      radius,
       0,
-      0,
-      canvas.width,
-      canvas.height,
+      Math.PI * 2,
     );
+    context.clip();
+
+    const scale = Math.max(
+      (radius * 2) / image.naturalWidth,
+      (radius * 2) / image.naturalHeight,
+    );
+
+    const drawWidth =
+      image.naturalWidth * scale;
+    const drawHeight =
+      image.naturalHeight * scale;
+
+    const drawX =
+      center - drawWidth / 2;
+    const drawY =
+      center - drawHeight / 2;
 
     context.globalAlpha = opacity;
     context.drawImage(
       image,
-      0,
-      0,
-      canvas.width,
-      canvas.height,
+      drawX,
+      drawY,
+      drawWidth,
+      drawHeight,
     );
 
-    const watermarkBlob = await new Promise<Blob | null>(
-      (resolve) =>
-        canvas.toBlob(
-          resolve,
-          'image/jpeg',
-          0.88,
-        ),
+    context.restore();
+
+    context.globalAlpha = 0.10;
+    context.strokeStyle = '#6b7280';
+    context.lineWidth = 8;
+    context.beginPath();
+    context.arc(
+      center,
+      center,
+      radius,
+      0,
+      Math.PI * 2,
     );
+    context.stroke();
+
+    const watermarkBlob =
+      await new Promise<Blob | null>(
+        (resolve) =>
+          canvas.toBlob(
+            resolve,
+            'image/jpeg',
+            0.90,
+          ),
+      );
 
     if (!watermarkBlob) {
       throw new Error(
@@ -828,17 +849,20 @@ export async function prepareOrderPdf(
     );
 
     /* ========================================================
-       GRANDPA WATERMARK BACKGROUND
+       CENTER CIRCULAR GRANDPA WATERMARK
        ======================================================== */
+
+    /* Large centered circular Grandpa watermark. */
+    const watermarkSize = 400;
+    const watermarkX =
+      (PAGE_W - watermarkSize) / 2;
+    const watermarkY =
+      (PAGE_H - watermarkSize) / 2 - 10;
 
     c += `
 q
-${PAGE_W.toFixed(
-  2,
-)} 0 0 ${PAGE_H.toFixed(
-      2,
-    )}
-0 0 cm
+${watermarkSize.toFixed(2)} 0 0 ${watermarkSize.toFixed(2)}
+${watermarkX.toFixed(2)} ${watermarkY.toFixed(2)} cm
 /Im2 Do
 Q
 `;
@@ -998,19 +1022,15 @@ Q
         TABLE_ROW_H;
 
     /* ========================================================
-       HEADER BACKGROUND FIRST
+       TABLE HEADER - TRANSPARENT
        ======================================================== */
-
-    c += fillColor(
-      ...TABLE_HEADER_FILL,
-    );
 
     c += rectangle(
       TABLE_X,
       tableHeaderBottom,
       TABLE_W,
       TABLE_HEADER_H,
-      true,
+      false,
     );
 
     /* ========================================================
@@ -1312,11 +1332,7 @@ Q
         summaryTop -
         SUMMARY_H;
 
-      /* Summary header background */
-
-      c += fillColor(
-        ...TABLE_HEADER_FILL,
-      );
+      /* Summary header - transparent */
 
       c += rectangle(
         SUMMARY_X,
@@ -1324,7 +1340,7 @@ Q
           24,
         SUMMARY_W,
         24,
-        true,
+        false,
       );
 
       /* Summary outer border */
@@ -1497,16 +1513,14 @@ Q
         0.5,
       );
 
-      c += fillColor(
-        ...NOTE_FILL,
-      );
+      /* Note background - transparent */
 
       c += rectangle(
         NOTE_X,
         noteY,
         NOTE_W,
         NOTE_H,
-        true,
+        false,
       );
 
       c += fillColor(
