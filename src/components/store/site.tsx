@@ -58,8 +58,6 @@ const nav = [
 
   { to: '/products', label: 'Products' },
 
-  { to: '/combo-offers', label: 'Combo Offers' },
-
   { to: '/gallery', label: 'Gallery' },
 
   { to: '/contact', label: 'Contact Us' },
