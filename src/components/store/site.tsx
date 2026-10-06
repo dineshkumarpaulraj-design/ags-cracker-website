@@ -822,21 +822,21 @@ export function Header() {
 
           <div className="ags-min-order-marquee flex min-w-max items-center whitespace-nowrap py-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em] sm:py-2 sm:text-xs">
 
-            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹3,000 ⚠️</span>
 
-            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹3,000 ⚠️</span>
 
-            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹3,000 ⚠️</span>
 
-            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹3,000 ⚠️</span>
 
-            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹3,000 ⚠️</span>
 
-            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹3,000 ⚠️</span>
 
-            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹3,000 ⚠️</span>
 
-            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹5,000 ⚠️</span>
+            <span className="px-8">⚠️ ALERT: MINIMUM ORDER VALUE ₹3,000 ⚠️</span>
 
           </div>
 
@@ -1248,7 +1248,7 @@ export function Header() {
 
               <p className="mt-1 text-xl font-black text-primary">
 
-                ₹5,000
+                ₹3,000
 
               </p>
 
@@ -1256,7 +1256,7 @@ export function Header() {
 
               <p className="mt-1 text-xs leading-5 text-muted-foreground">
 
-                Minimum order value is ₹5,000. You can still
+                Minimum order value is ₹3,000. You can still
 
                 download the PDF and send your enquiry via WhatsApp.
 
