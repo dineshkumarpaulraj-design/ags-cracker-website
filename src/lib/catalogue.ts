@@ -38,7 +38,7 @@ export type Product = {
  * Replace individual image fields with product photos whenever they are supplied.
  */
 export const products: Product[] = [
-  { slug: '1-23-4-kuruvi', name: "23/4\" Kuruvi", category: "One Sound Crackers", image: '/images/products/webp/kuruvi.webp', description: "23/4\" Kuruvi from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 70, price: 8, unit: "1 Pkt", available: true },
+  { slug: '1-23-4-kuruvi', name: "23/4\" Kuruvi", category: "One Sound Crackers", image: '/images/products/webp/kuruvi.webp', description: "23/4\" Kuruvi from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 70, price: 9, unit: "1 Pkt", available: true },
   { slug: '2-3-lakshmi-lokler', name: "3\" Lakshmi/Lokler", category: "One Sound Crackers", image: '/images/products/webp/lakshmi.webp', description: "3\" Lakshmi/Lokler from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 130, price: 15, unit: "1 Pkt", available: true },
   { slug: '3-4-lakshmi-lion', name: "4\" Lakshmi/Lion", category: "One Sound Crackers", image: '/images/products/webp/lakshmi4.webp', description: "4\" Lakshmi/Lion from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 180, price: 20, unit: "1 Pkt", available: true },
   { slug: '4-4-spiderman-deluxe', name: "4\" Spiderman Deluxe", category: "One Sound Crackers", image: '/images/products/webp/goldlakshmi.webp', description: "4\" Spiderman Deluxe from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 450, price: 50, unit: "1 Pkt", available: true },
@@ -59,7 +59,7 @@ export const products: Product[] = [
   { slug: '19-whistling-wheel', name: "Whistling Wheel", category: "Fancy Crackers", image: '/images/products/webp/wheel.webp', description: "Whistling Wheel from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 1600, price: 176, unit: "1 Box", available: true },
   { slug: '20-flower-pots-big', name: "Flower Pots Big", category: "Flower Pots", image: '/images/products/webp/flower.webp', description: "Flower Pots Big from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 500, price: 55, unit: "1 Box", available: true },
   { slug: '21-flower-pots-special', name: "Flower Pots Special", category: "Flower Pots", image: '/images/products/webp/flower2.webp', description: "Flower Pots Special from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 500, price: 55, unit: "1 Box", available: true },
-  { slug: '22-flower-pots-asoka', name: "Flower Pots Asoka", category: "Flower Pots", image: '/images/products/webp/flower3.webp', description: "Flower Pots Asoka from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 650, price: 72, unit: "1 Box", available: true },
+  { slug: '22-flower-pots-asoka', name: "Flower Pots Asoka", category: "Flower Pots", image: '/images/products/webp/flower3.webp', description: "Flower Pots Asoka from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 855, price: 94, unit: "1 Box", available: true },
   { slug: '23-colour-koti-10pcs', name: "Colour Koti (10Pcs)", category: "Colour Fountains", image: '/images/products/webp/flower4.webp', description: "Colour Koti (10Pcs) from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 1800, price: 198, unit: "1 Box", available: true },
   { slug: '24-colour-koti-deluxe-5pcs', name: "Colour Koti Deluxe (5Pcs)", category: "Colour Fountains", image: '/images/products/webp/flower5.webp', description: "Colour Koti Deluxe (5Pcs) from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 1600, price: 176, unit: "1 Box", available: true },
   { slug: '25-colour-koti-super-deluxe-10pcs', name: "Colour Koti Super Deluxe (10Pcs)", category: "Colour Fountains", image:'/images/products/webp/flower3.webp', description: "Colour Koti Super Deluxe (10Pcs) from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 5000, price: 550, unit: "1 Box", available: true },
@@ -382,11 +382,11 @@ export const products: Product[] = [
   unit: "Piece",
   available: true,
 },
-  { slug: '168-20-item-box', name: "20 Item Box", category: "Gift Boxes", image: '/images/products/webp/giftbox2.webp', description: "20 Item Box from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 3000, price: 300, unit: "1 Box", available: true },
-  { slug: '169-25-item-box', name: "25 Item Box", category: "Gift Boxes", image: '/images/products/webp/giftbox2.webp', description: "25 Item Box from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 4000, price: 400, unit: "1 Box", available: true },
-  { slug: '170-30-item-box', name: "30 Item Box", category: "Gift Boxes", image: '/images/products/webp/giftbox2.webp', description: "30 Item Box from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 4500, price: 450, unit: "1 Box", available: true },
-  { slug: '171-40-item-box', name: "40 Item Box", category: "Gift Boxes", image: '/images/products/webp/giftbox2.webp', description: "40 Item Box from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 6900, price: 690, unit: "1 Box", available: true },
-  { slug: '172-50-item-box', name: "50 Item Box", category: "Gift Boxes", image: '/images/products/webp/giftbox.webp', description: "50 Item Box from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 9500, price: 950, unit: "1 Box", available: true },
+  { slug: '168-20-item-box', name: "20 Item Box", category: "Gift Boxes", image: '/images/products/webp/giftbox2.webp', description: "20 Item Box from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 3000, price: 330, unit: "1 Box", available: true },
+  { slug: '169-25-item-box', name: "25 Item Box", category: "Gift Boxes", image: '/images/products/webp/giftbox2.webp', description: "25 Item Box from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 4000, price: 440, unit: "1 Box", available: true },
+  { slug: '170-30-item-box', name: "30 Item Box", category: "Gift Boxes", image: '/images/products/webp/giftbox2.webp', description: "30 Item Box from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 4500, price: 495, unit: "1 Box", available: true },
+  { slug: '171-40-item-box', name: "40 Item Box", category: "Gift Boxes", image: '/images/products/webp/giftbox2.webp', description: "40 Item Box from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 6900, price: 760, unit: "1 Box", available: true },
+  { slug: '172-50-item-box', name: "50 Item Box", category: "Gift Boxes", image: '/images/products/webp/giftbox.webp', description: "50 Item Box from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 9500, price: 1050, unit: "1 Box", available: true },
 ];
 
 export const gallery = [
@@ -405,3 +405,4 @@ export function discount(product: Product) {
     ? Math.round((1 - product.price / product.mrp) * 100)
     : null;
 }
+
