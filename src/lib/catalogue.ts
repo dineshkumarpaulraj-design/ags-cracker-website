@@ -38,7 +38,7 @@ export type Product = {
  * Replace individual image fields with product photos whenever they are supplied.
  */
 export const products: Product[] = [
-  { slug: '1-23-4-kuruvi', name: "23/4\" Kuruvi", category: "One Sound Crackers", image: '/images/products/webp/kuruvi.webp', description: "23/4\" Kuruvi from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 70, price: 9, unit: "1 Pkt", available: true },
+  { slug: '1-23-4-kuruvi', name: "23/4\" Kuruvi", category: "One Sound Crackers", image: '/images/products/webp/kuruvi.webp', description: "23/4\" Kuruvi from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 90, price: 9, unit: "1 Pkt", available: true },
   { slug: '2-3-lakshmi-lokler', name: "3\" Lakshmi/Lokler", category: "One Sound Crackers", image: '/images/products/webp/lakshmi.webp', description: "3\" Lakshmi/Lokler from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 130, price: 15, unit: "1 Pkt", available: true },
   { slug: '3-4-lakshmi-lion', name: "4\" Lakshmi/Lion", category: "One Sound Crackers", image: '/images/products/webp/lakshmi4.webp', description: "4\" Lakshmi/Lion from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 180, price: 20, unit: "1 Pkt", available: true },
   { slug: '4-4-spiderman-deluxe', name: "4\" Spiderman Deluxe", category: "One Sound Crackers", image: '/images/products/webp/goldlakshmi.webp', description: "4\" Spiderman Deluxe from the AGS CRACKER festive collection. Listed price and unit are based on the supplied price list.", mrp: 450, price: 50, unit: "1 Pkt", available: true },
