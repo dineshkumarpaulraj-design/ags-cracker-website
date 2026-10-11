@@ -830,7 +830,7 @@ function Cart() {
                     <div className="col-start-2 flex h-10 w-28 items-center border border-input sm:col-start-3 sm:row-start-1">
         <input
           type="number"
-          min={1}
+          min={0}
           step={1}
           inputMode="numeric"
           aria-label={`Quantity for ${product.name}`}
@@ -851,12 +851,25 @@ function Cart() {
             if (value === '') return;
 
             const nextQuantity = Number(value);
-            if (Number.isSafeInteger(nextQuantity) && nextQuantity >= 1) {
-              update(product.slug, nextQuantity);
+            if (!Number.isSafeInteger(nextQuantity) || nextQuantity < 0) return;
+
+            if (nextQuantity === 0) {
+              remove(product.slug);
+              setQuantityDrafts((current) => {
+                const next = { ...current };
+                delete next[product.slug];
+                return next;
+              });
               setPreparedPdf(null);
               setPreparedPdfKey('');
               setError('');
+              return;
             }
+
+            update(product.slug, nextQuantity);
+            setPreparedPdf(null);
+            setPreparedPdfKey('');
+            setError('');
           }}
           onBlur={(event) => {
             const value = Number(event.currentTarget.value);
