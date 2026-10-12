@@ -1,5 +1,4 @@
 import pdfHeader from '@/assets/ags-pdf-header.jpg';
-import paymentQr from '@/assets/ags-payment-qr.png';
 
 import type { Product } from './catalogue';
 
@@ -947,34 +946,6 @@ async function imageBytes(
 
 
 
-/** Convert the imported payment QR image into JPEG bytes for the custom PDF writer. */
-async function createPaymentQrJpeg(url: string) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Unable to load the payment QR image.');
-  const blob = await response.blob();
-  const objectUrl = URL.createObjectURL(blob);
-  try {
-    const image = new Image();
-    image.src = objectUrl;
-    await image.decode();
-    const canvas = document.createElement('canvas');
-    canvas.width = image.naturalWidth;
-    canvas.height = image.naturalHeight;
-    const context = canvas.getContext('2d');
-    if (!context) throw new Error('Unable to prepare the payment QR image.');
-    context.fillStyle = '#ffffff';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(image, 0, 0);
-    const jpeg = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, 'image/jpeg', 0.98),
-    );
-    if (!jpeg) throw new Error('Unable to encode the payment QR image.');
-    return new Uint8Array(await jpeg.arrayBuffer());
-  } finally {
-    URL.revokeObjectURL(objectUrl);
-  }
-}
-
 async function jpegDimensions(
 
   bytes: Uint8Array,
@@ -1426,9 +1397,6 @@ export async function prepareOrderPdf(
      ========================================================== */
 
 
-
-  const paymentQrBytes = await createPaymentQrJpeg(paymentQr);
-  const paymentQrSize = await jpegDimensions(paymentQrBytes);
 
   const grandpaWatermark =
 
@@ -3117,25 +3085,6 @@ Q
 
 
     /* ========================================================
-       PAYMENT QR SECTION - LAST PAGE
-       ======================================================== */
-    if (isLastPage) {
-      const qrSize = 82;
-      const qrX = 433.5;
-      const qrY = 72;
-      c += fillColor(0.97, 0.98, 1);
-      c += rectangle(402, 58, 145, 145, true);
-      c += strokeColor(0, 0, 0);
-      c += lineWidth(0.8);
-      c += rectangle(402, 58, 145, 145, false);
-      c += fillColor(...BLACK);
-      c += bold('Marimuthu G', 410, 184, 10);
-      c += pdfLine('BHIM PAY NO: 9840023543', 410, 170, 7.2);
-      c += `q\n${qrSize} 0 0 ${qrSize} ${qrX} ${qrY} cm\n/Im3 Do\nQ\n`;
-      c += bold('SCAN & PAY', 410, 65, 8);
-    }
-
-    /* ========================================================
 
        FOOTER
 
@@ -3253,15 +3202,9 @@ Q
 
 
 
-  const paymentQrObject =
-
-    watermarkObject + 1;
-
-
-
   const objectCount =
 
-    paymentQrObject;
+    watermarkObject;
 
 
 
@@ -3411,7 +3354,6 @@ Q
 
             `/Im2 ${watermarkObject} 0 R ` +
 
-            `/Im3 ${paymentQrObject} 0 R ` +
 
             `>> ` +
 
@@ -3613,28 +3555,6 @@ Q
 
   );
 
-
-
-  /* Payment QR image */
-  objectMap.set(
-    paymentQrObject,
-    concatBytes([
-      ascii(
-        `${paymentQrObject} 0 obj\n` +
-          `<< /Type /XObject ` +
-          `/Subtype /Image ` +
-          `/Width ${paymentQrSize.width} ` +
-          `/Height ${paymentQrSize.height} ` +
-          `/ColorSpace /DeviceRGB ` +
-          `/BitsPerComponent 8 ` +
-          `/Filter /DCTDecode ` +
-          `/Length ${paymentQrBytes.length} >>\n` +
-          `stream\n`,
-      ),
-      paymentQrBytes,
-      ascii(`\nendstream\nendobj\n`),
-    ]),
-  );
 
 
   /* ==========================================================
