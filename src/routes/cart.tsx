@@ -29,6 +29,7 @@ import { PageIntro } from '@/components/store/site';
 import { useCart } from '@/lib/cart';
 
 import { priceText, whatsapp } from '@/lib/catalogue';
+import paymentQr from '@/assets/ags-payment-qr.png';
 
 import {
 
@@ -996,6 +997,25 @@ function Cart() {
 
 
               <p className="mt-4 text-xs leading-6 text-muted-foreground">
+
+                <div className="mt-6 rounded-sm border border-border bg-white p-4 text-center">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    BHIM PAY
+                  </p>
+                  <h3 className="mt-1 text-xl font-bold text-navy">Marimuthu G</h3>
+                  <p className="mt-1 text-sm font-semibold text-navy">
+                    BHIM PAY NO: 9840023543
+                  </p>
+                  <img
+                    src={paymentQr}
+                    alt="BHIM payment QR code for Marimuthu G"
+                    className="mx-auto mt-4 h-44 w-44 object-contain"
+                    loading="lazy"
+                  />
+                  <p className="mt-2 text-sm font-bold tracking-wider text-primary">
+                    SCAN &amp; PAY
+                  </p>
+                </div>
 
                 The PDF contains your selected items, quantities, MRP,
 
