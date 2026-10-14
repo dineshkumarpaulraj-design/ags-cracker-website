@@ -1006,6 +1006,9 @@ function Cart() {
                   <p className="mt-1 text-sm font-semibold text-navy">
                     BHIM PAY NO: 9840023543
                   </p>
+                  <p className="mt-1 text-sm font-semibold text-navy">
+                    9840023543@upi
+                  </p>
                   <img
                     src={paymentQr}
                     alt="BHIM payment QR code for Marimuthu G"
