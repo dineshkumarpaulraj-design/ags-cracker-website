@@ -1007,7 +1007,7 @@ function Cart() {
                     BHIM PAY NO: 9840023543
                   </p>
                   <p className="mt-1 text-sm font-semibold text-navy">
-                    9840023543@upi
+                    UPI ID : 9840023543@upi
                   </p>
                   <img
                     src={paymentQr}
