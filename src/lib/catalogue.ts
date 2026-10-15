@@ -405,4 +405,3 @@ export function discount(product: Product) {
     ? Math.round((1 - product.price / product.mrp) * 100)
     : null;
 }
-
