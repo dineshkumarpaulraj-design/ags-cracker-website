@@ -270,7 +270,7 @@ const NOTE_BORDER = [
 
 const GOOGLE_SCRIPT_URL =
 
-  'https://script.google.com/macros/s/AKfycbzRwFj5D19hk1q-A4DFl6KR-QtqVLCku3G69WQrIbAF04EoHTqTZMJwx7B-JKRG2w4I/exec';
+  '';
 
 
 
